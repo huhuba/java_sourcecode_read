@@ -17,7 +17,11 @@ public class NodeTest {
         @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
-            int i=1/0;
+            try{
+                int i=1/0;
+            }catch (ArithmeticException e){
+
+            }
         }
     }
 

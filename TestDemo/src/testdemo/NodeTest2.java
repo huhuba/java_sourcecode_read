@@ -16,6 +16,7 @@ public class NodeTest2 {
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
             int i=1/0;
+
         }
     }
 
@@ -33,9 +34,9 @@ public class NodeTest2 {
                 return thread;
             }
         },new ThreadPoolExecutor.CallerRunsPolicy());
-        myTheadPool.execute(()->System.out.println("1"));
-        myTheadPool.execute(()->System.out.println("1"));
-        myTheadPool.execute(()->System.out.println("1"));
+        myTheadPool.execute(()->System.out.println(Thread.currentThread()));
+        myTheadPool.execute(()->System.out.println(Thread.currentThread()));
+        myTheadPool.execute(()->System.out.println(Thread.currentThread()));
 
 
     }
