@@ -894,6 +894,7 @@ class Thread implements Runnable {
         synchronized (blockerLock) {
             Interruptible b = blocker;
             if (b != null) {
+                //仅仅是用来设置 是否打断的标识
                 interrupt0();           // Just to set the interrupt flag
                 b.interrupt(this);
                 return;
@@ -914,6 +915,9 @@ class Thread implements Runnable {
      * at the time of the interrupt will be reflected by this method
      * returning false.
      *
+     * 测试当前线程是否已被中断。此方法清除线程的中断状态。换句话说，如果这个方法被连续调用两次，
+     * 第二个调用将返回false(除非当前线程再次被中断，在第一个调用清除了它的中断状态之后，并且在第二个调用检查它之前)。
+     * 因为线程在中断时不是活动线程而被忽略的线程中断将由这个方法返回false来反映。
      * @return  <code>true</code> if the current thread has been interrupted;
      *          <code>false</code> otherwise.
      * @see #isInterrupted()
@@ -944,6 +948,7 @@ class Thread implements Runnable {
      * Tests if some Thread has been interrupted.  The interrupted state
      * is reset or not based on the value of ClearInterrupted that is
      * passed.
+     * 测试某个线程是否被中断。中断状态是重置的，或者不是，基于传递的ClearInterrupted值。
      */
     private native boolean isInterrupted(boolean ClearInterrupted);
 
