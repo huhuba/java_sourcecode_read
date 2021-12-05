@@ -881,6 +881,7 @@ class Thread implements Runnable {
      *
      * <p> Interrupting a thread that is not alive need not have any effect.
      *
+     * public void interrupt()：是实例方法。
      * @throws  SecurityException
      *          if the current thread cannot modify this thread
      *
@@ -914,7 +915,7 @@ class Thread implements Runnable {
      * <p>A thread interruption ignored because a thread was not alive
      * at the time of the interrupt will be reflected by this method
      * returning false.
-     *
+     * public static boolean interrupted()：是静态方法。
      * 测试当前线程是否已被中断。此方法清除线程的中断状态。换句话说，如果这个方法被连续调用两次，
      * 第二个调用将返回false(除非当前线程再次被中断，在第一个调用清除了它的中断状态之后，并且在第二个调用检查它之前)。
      * 因为线程在中断时不是活动线程而被忽略的线程中断将由这个方法返回false来反映。
