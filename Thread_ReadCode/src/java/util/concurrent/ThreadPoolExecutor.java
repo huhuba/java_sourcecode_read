@@ -594,6 +594,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * drainTo. But if the queue is a DelayQueue or any other kind of
      * queue for which poll or drainTo may fail to remove some
      * elements, it deletes them one by one.
+     * Q:为什么可能会无法删除？
      */
     private List<Runnable> drainQueue() {
         BlockingQueue<Runnable> q = workQueue;
