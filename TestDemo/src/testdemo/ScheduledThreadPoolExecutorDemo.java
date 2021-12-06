@@ -7,6 +7,12 @@ public class ScheduledThreadPoolExecutorDemo {
 
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 /*
+        //execute():该方法立即执行 任务
+        System.out.println("start:"+new Date());
+        executor.execute(()->System.out.println("start:"+new Date()));
+        System.out.println("start:"+new Date());
+*/
+/*
         //第一种用法：延迟 delay（数量）的 unit（单位）时间后开始执行 command
         executor.schedule(()->System.out.println("hello"),1, TimeUnit.SECONDS);
 */
@@ -25,6 +31,7 @@ public class ScheduledThreadPoolExecutorDemo {
             }
         },1,2,TimeUnit.SECONDS);*/
 /*
+
         //第三种用法：
         //FixedDelay：固定延迟
         //延迟 initialDelay 后开始执行第一个任务，任务执行后（开始计时）固定延迟delay(数量) unit(单位)的时间后，开始执行下一个任务
