@@ -19,7 +19,7 @@ public class NodeTest {
             super.afterExecute(r, t);
             try{
                 int i=1/0;
-            }catch (ArithmeticException e){
+            }catch (ArithmeticException e){//捕捉异常，不做处理的话，系统也不会抛出该异常，就给没有出现过一样，“一切正常”
 
             }
         }
