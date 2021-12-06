@@ -895,7 +895,7 @@ class Thread implements Runnable {
         synchronized (blockerLock) {
             Interruptible b = blocker;
             if (b != null) {
-                //仅仅是用来设置 是否打断的标识
+                //仅仅是用来设置 是否中断的标识
                 interrupt0();           // Just to set the interrupt flag
                 b.interrupt(this);
                 return;
