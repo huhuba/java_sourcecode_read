@@ -583,6 +583,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * enable running tasks during shutdown.
      *
      * @param shutdownOK true if should return true if SHUTDOWN
+     * <br/>ScheduledThreadPoolExecutor启动执行新的任务需要做状态检查
+     *<br/>1：如果线程池状态为RUNNING，返回true,表示可以执行
+     *<br/>2：如果线程池状态为SHUTDOWN，是否可以执行就依赖于参数shutdownOK
+     *<br/>       shutdownOK=true:可以执行；shutdownOK=false:不可以执行
      */
     final boolean isRunningOrShutdown(boolean shutdownOK) {
         int rs = runStateOf(ctl.get());
@@ -1194,6 +1198,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * to do that.
      *
      * @throws SecurityException {@inheritDoc}
+     * <br/>将线程池状态设置为 SHUTDOWN
      */
     public void shutdown() {
         final ReentrantLock mainLock = this.mainLock;
@@ -1225,6 +1230,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * fails to respond to interrupts may never terminate.
      *
      * @throws SecurityException {@inheritDoc}
+     * <br/>将线程池状态设置为 STOP
      */
     public List<Runnable> shutdownNow() {
         List<Runnable> tasks;
@@ -1566,6 +1572,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *
      * @param task the task to remove
      * @return {@code true} if the task was removed
+     * <br/>任务队列中删除该任务
      */
     public boolean remove(Runnable task) {
         boolean removed = workQueue.remove(task);

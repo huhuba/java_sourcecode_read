@@ -1,6 +1,8 @@
 package testdemo;
 
+import java.util.Date;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ScheduledThreadPoolExecutorDemo {
     public static void main(String[] args) {
@@ -16,7 +18,7 @@ public class ScheduledThreadPoolExecutorDemo {
         //第一种用法：延迟 delay（数量）的 unit（单位）时间后开始执行 command
         executor.schedule(()->System.out.println("hello"),1, TimeUnit.SECONDS);
 */
-/*        //第二种用法：延迟initialDelay(数量) unit(时间)后开始执行任务，之后延迟 delay（数量）的 unit（单位）时间后开始以固定的period(频率)循环执行 command
+        //第二种用法：延迟initialDelay(数量) unit(时间)后开始执行任务，之后延迟 delay（数量）的 unit（单位）时间后开始以固定的period(频率)循环执行 command
         //FixedRate：固定频率
         //Q:period:是否包含 command的执行时间？ command的执行时间> period 怎么样？
         //A:  如果 period>=command的执行时间 ,固定频率为 period;
@@ -29,7 +31,7 @@ public class ScheduledThreadPoolExecutorDemo {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        },1,2,TimeUnit.SECONDS);*/
+        },1,2,TimeUnit.SECONDS);
 /*
 
         //第三种用法：

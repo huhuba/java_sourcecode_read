@@ -239,7 +239,7 @@ class Thread implements Runnable {
      */
     public static native Thread currentThread();
 
-    /**
+        /**
      * A hint to the scheduler that the current thread is willing to yield
      * its current use of a processor. The scheduler is free to ignore this
      * hint.
@@ -254,6 +254,7 @@ class Thread implements Runnable {
      * bugs due to race conditions. It may also be useful when designing
      * concurrency control constructs such as the ones in the
      * {@link java.util.concurrent.locks} package.
+     *<br/>给调度程序发出提示，当前线程愿意让出处理器，但是调度程序可以忽略该提示
      */
     public static native void yield();
 
@@ -887,6 +888,8 @@ class Thread implements Runnable {
      *
      * @revised 6.0
      * @spec JSR-51
+     * <br/>
+     * 设置中断标志为true,不重置标志
      */
     public void interrupt() {
         if (this != Thread.currentThread())
@@ -923,6 +926,8 @@ class Thread implements Runnable {
      *          <code>false</code> otherwise.
      * @see #isInterrupted()
      * @revised 6.0
+     * <br/>返回当前的线程是否被中断，中断返回 true,否则返回false,
+     * <br/>并且清除中断标志：设置为false;
      */
     public static boolean interrupted() {
         return currentThread().isInterrupted(true);
