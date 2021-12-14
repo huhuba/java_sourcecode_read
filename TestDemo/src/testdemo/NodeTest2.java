@@ -1,11 +1,9 @@
 package testdemo;
 
 
-import java.util.concurrent.*;
-
 public class NodeTest2 {
 
-    static  class  MyTheadPool extends ThreadPoolExecutor {
+/*    static  class  MyTheadPool extends ThreadPoolExecutor {
 
 
         public MyTheadPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
@@ -18,9 +16,10 @@ public class NodeTest2 {
             int i=1/0;
 
         }
-    }
+    }*/
 
     public static void main(String[] args) {
+/*
         MyTheadPool myTheadPool = new MyTheadPool(1, 1, 0, TimeUnit.MINUTES, new LinkedBlockingQueue<>(), new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -38,6 +37,7 @@ public class NodeTest2 {
         myTheadPool.execute(()->System.out.println(Thread.currentThread()));
         myTheadPool.execute(()->System.out.println(Thread.currentThread()));
 
+*/
 
     }
 }

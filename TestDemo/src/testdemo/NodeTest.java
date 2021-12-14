@@ -26,11 +26,12 @@ public class NodeTest {
     }
 
     public static void main(String[] args) {
-        MyTheadPool myTheadPool = new MyTheadPool(1, 1, 0, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+/*        MyTheadPool myTheadPool = new MyTheadPool(1, 1, 0, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
         myTheadPool.execute(()->System.out.println("1"));
         myTheadPool.execute(()->System.out.println("1"));
-        myTheadPool.execute(()->System.out.println("1"));
-
-
+        myTheadPool.execute(()->System.out.println("1"));*/
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+        executor.submit(()->System.out.println("1"));
+//        executor.shutdownNow();
     }
 }

@@ -37,52 +37,12 @@ package java.util.concurrent;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * A cancellable asynchronous computation.  This class provides a base
- * implementation of {@link Future}, with methods to start and cancel
- * a computation, query to see if the computation is complete, and
- * retrieve the result of the computation.  The result can only be
- * retrieved when the computation has completed; the {@code get}
- * methods will block if the computation has not yet completed.  Once
- * the computation has completed, the computation cannot be restarted
- * or cancelled (unless the computation is invoked using
- * {@link #runAndReset}).
- *
- * <p>A {@code FutureTask} can be used to wrap a {@link Callable} or
- * {@link Runnable} object.  Because {@code FutureTask} implements
- * {@code Runnable}, a {@code FutureTask} can be submitted to an
- * {@link Executor} for execution.
- *
- * <p>In addition to serving as a standalone class, this class provides
- * {@code protected} functionality that may be useful when creating
- * customized task classes.
- *
- * @since 1.5
- * @author Doug Lea
- * @param <V> The result type returned by this FutureTask's {@code get} methods
+ * 代表了要执行的任务本身
  */
 public class FutureTask<V> implements RunnableFuture<V> {
-    /*
-     * Revision notes: This differs from previous versions of this
-     * class that relied on AbstractQueuedSynchronizer, mainly to
-     * avoid surprising users about retaining interrupt status during
-     * cancellation races. Sync control in the current design relies
-     * on a "state" field updated via CAS to track completion, along
-     * with a simple Treiber stack to hold waiting threads.
-     *
-     * Style note: As usual, we bypass overhead of using
-     * AtomicXFieldUpdaters and instead directly use Unsafe intrinsics.
-     */
+
 
     /**
-     * The run state of this task, initially NEW.  The run state
-     * transitions to a terminal state only in methods set,
-     * setException, and cancel.  During completion, state may take on
-     * transient values of COMPLETING (while outcome is being set) or
-     * INTERRUPTING (only while interrupting the runner to satisfy a
-     * cancel(true)). Transitions from these intermediate to final
-     * states use cheaper ordered/lazy writes because values are unique
-     * and cannot be further modified.
-     *
      * Possible state transitions:
      * NEW -> COMPLETING -> NORMAL
      * NEW -> COMPLETING -> EXCEPTIONAL
@@ -90,17 +50,27 @@ public class FutureTask<V> implements RunnableFuture<V> {
      * NEW -> INTERRUPTING -> INTERRUPTED
      */
     private volatile int state;
+    /** 新建状态 new FutureTask() */
     private static final int NEW          = 0;
+    /**正在执行状态 */
     private static final int COMPLETING   = 1;
+    /**正常结束 */
     private static final int NORMAL       = 2;
+    /**异常结束 */
     private static final int EXCEPTIONAL  = 3;
+    /**取消造成的结束 */
     private static final int CANCELLED    = 4;
+    /**正在中断过程中 */
     private static final int INTERRUPTING = 5;
+    /** 中断完成 */
     private static final int INTERRUPTED  = 6;
 
     /** The underlying callable; nulled out after running */
     private Callable<V> callable;
-    /** The result to return or exception to throw from get() */
+    /** The result to return or exception to throw from get()
+     * 执行完成后要返回的值
+     * 或者抛出异常
+     * */
     private Object outcome; // non-volatile, protected by state reads/writes
     /** The thread running the callable; CASed during run() */
     private volatile Thread runner;
@@ -152,11 +122,11 @@ public class FutureTask<V> implements RunnableFuture<V> {
         this.callable = Executors.callable(runnable, result);
         this.state = NEW;       // ensure visibility of callable
     }
-
+    /**  是否已经取消   */
     public boolean isCancelled() {
         return state >= CANCELLED;
     }
-
+    /** 是否执行过*/
     public boolean isDone() {
         return state != NEW;
     }
@@ -189,6 +159,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
 
     /**
      * @throws CancellationException {@inheritDoc}
+     * 该方法是阻断执行，直到结束或者异常位置
      */
     public V get() throws InterruptedException, ExecutionException {
         int s = state;
@@ -199,6 +170,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
 
     /**
      * @throws CancellationException {@inheritDoc}
+     * 该方法带超时时间
      */
     public V get(long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
@@ -211,26 +183,9 @@ public class FutureTask<V> implements RunnableFuture<V> {
         return report(s);
     }
 
-    /**
-     * Protected method invoked when this task transitions to state
-     * {@code isDone} (whether normally or via cancellation). The
-     * default implementation does nothing.  Subclasses may override
-     * this method to invoke completion callbacks or perform
-     * bookkeeping. Note that you can query status inside the
-     * implementation of this method to determine whether this task
-     * has been cancelled.
-     */
+    /** <br/>钩子函数*/
     protected void done() { }
 
-    /**
-     * Sets the result of this future to the given value unless
-     * this future has already been set or has been cancelled.
-     *
-     * <p>This method is invoked internally by the {@link #run} method
-     * upon successful completion of the computation.
-     *
-     * @param v the value
-     */
     protected void set(V v) {
         if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) {
             outcome = v;
@@ -239,16 +194,6 @@ public class FutureTask<V> implements RunnableFuture<V> {
         }
     }
 
-    /**
-     * Causes this future to report an {@link ExecutionException}
-     * with the given throwable as its cause, unless this future has
-     * already been set or has been cancelled.
-     *
-     * <p>This method is invoked internally by the {@link #run} method
-     * upon failure of the computation.
-     *
-     * @param t the cause of failure
-     */
     protected void setException(Throwable t) {
         if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) {
             outcome = t;
@@ -290,15 +235,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
         }
     }
 
-    /**
-     * Executes the computation without setting its result, and then
-     * resets this future to initial state, failing to do so if the
-     * computation encounters an exception or is cancelled.  This is
-     * designed for use with tasks that intrinsically execute more
-     * than once.
-     *
-     * @return {@code true} if successfully run and reset
-     */
+    /** 执行并重置 */
     protected boolean runAndReset() {
         if (state != NEW ||
             !UNSAFE.compareAndSwapObject(this, runnerOffset,
@@ -356,6 +293,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
      * stack.  See other classes such as Phaser and SynchronousQueue
      * for more detailed explanation.
      */
+    /** 在Treiber堆栈中记录等待线程的简单链表节点。 */
     static final class WaitNode {
         volatile Thread thread;
         volatile WaitNode next;
@@ -469,6 +407,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
         }
     }
 
+    //以下代码看不懂
     // Unsafe mechanics
     private static final sun.misc.Unsafe UNSAFE;
     private static final long stateOffset;

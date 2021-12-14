@@ -23,29 +23,30 @@ public class ScheduledThreadPoolExecutorDemo {
         //Q:period:是否包含 command的执行时间？ command的执行时间> period 怎么样？
         //A:  如果 period>=command的执行时间 ,固定频率为 period;
         //    如果  period<command的执行时间 ,固定频率为 command的执行时间 ;
-        System.out.println("start:"+new Date());
-        executor.scheduleAtFixedRate(()->{
-            System.out.println(new Date());
+//        System.out.println("start:"+new Date());
+/*        executor.scheduleAtFixedRate(()->{
+            System.out.println("start:"+new Date());
             try {
                 TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        },1,2,TimeUnit.SECONDS);
-/*
+            System.out.println("  end:"+new Date());
+        },0,2,TimeUnit.SECONDS);*/
 
         //第三种用法：
         //FixedDelay：固定延迟
         //延迟 initialDelay 后开始执行第一个任务，任务执行后（开始计时）固定延迟delay(数量) unit(单位)的时间后，开始执行下一个任务
-        System.out.println("start:"+new Date());
         executor.scheduleWithFixedDelay(()->{
+            System.out.println("start:"+new Date());
+
             try {
-                TimeUnit.SECONDS.sleep(3);
+                TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println(new Date());
+            System.out.println("  end:"+new Date());
 
-        },1,2,TimeUnit.SECONDS);*/
+        },1,2,TimeUnit.SECONDS);
     }
 }

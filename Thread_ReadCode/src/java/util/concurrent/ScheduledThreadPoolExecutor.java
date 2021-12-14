@@ -943,9 +943,14 @@ public class ScheduledThreadPoolExecutor
          * identified by heapIndex.
          */
 
+        /**
+         * 初始容量为16
+         */
         private static final int INITIAL_CAPACITY = 16;
         /**
          * queue:存放RunnableScheduledFuture的堆
+         * 1:数组存放
+         * 2：小顶堆/小根堆：最小值在最小索引位
          */
         private RunnableScheduledFuture<?>[] queue =
             new RunnableScheduledFuture<?>[INITIAL_CAPACITY];
@@ -1007,6 +1012,7 @@ public class ScheduledThreadPoolExecutor
         /**
          * Sifts element added at top down to its heap-ordered spot.
          * Call only when holding lock.
+         * <br/>heapify?
          */
         private void siftDown(int k, RunnableScheduledFuture<?> key) {
             int half = size >>> 1;
@@ -1204,35 +1210,37 @@ public class ScheduledThreadPoolExecutor
          */
         public RunnableScheduledFuture<?> take() throws InterruptedException {
             final ReentrantLock lock = this.lock;
-            lock.lockInterruptibly();//以可响应中断的方式响应加锁等待
+            lock.lockInterruptibly();//加锁：以可响应中断的方式加锁等待，这种加锁方式与 lock()加锁方式有什么区别？
             try {
-                for (;;) {
+                for (;;) {//死循环
+                    //queue:是一个数组实现的小根堆/小顶堆，初始容量是16.
                     RunnableScheduledFuture<?> first = queue[0];
-                    if (first == null)
-                        available.await();
-                    else {
-                        long delay = first.getDelay(NANOSECONDS);
-                        if (delay <= 0)
+                    if (first == null)//如果任务为空（RunnableScheduledFuture[] 数组没有赋值的情况下，数组的初始值为空）
+                        available.await();//如果任务为空，则等待
+                    else {//不为空
+                        long delay = first.getDelay(NANOSECONDS);//取出任务的延时时间
+                        if (delay <= 0)//已经超过要延时的时间了
                             return finishPoll(first);
                         first = null; // don't retain ref while waiting
                         if (leader != null)
-                            available.await();
-                        else {
-                            Thread thisThread = Thread.currentThread();
-                            leader = thisThread;
+                            available.await();//除了第一位的线程，其他线程都等待，如果有其他线程A进入这个方法，发现leader不为空
+                                            //说明有线程在执行中，A等待就可以了.Q:不是加锁了吗，还有其他线程可以进来？
+                        else {//leader==null，说明没有任务在占用这个线程 ,执行该代码块
+                            Thread thisThread = Thread.currentThread();//Q:这个当前线程，指的是谁？线程池？用户？
+                            leader = thisThread;//leader的引用指向当前线程
                             try {
-                                available.awaitNanos(delay);
+                                available.awaitNanos(delay);//Q:为什么要等待这个时间？A:
                             } finally {
-                                if (leader == thisThread)
-                                    leader = null;
+                                if (leader == thisThread)//“==”比较，比较的是引用的值,即地址值。
+                                    leader = null;//最后将leader的引用设置为空，与leader不为空，就等待，相呼应
                             }
                         }
                     }
                 }
             } finally {
                 if (leader == null && queue[0] != null)
-                    available.signal();
-                lock.unlock();
+                    available.signal();//唤醒一个等待的线程，需要重新获得锁。
+                lock.unlock();//解锁
             }
         }
 
