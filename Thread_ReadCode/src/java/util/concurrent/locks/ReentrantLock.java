@@ -195,6 +195,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
 
     /**
      * Sync object for non-fair locks
+     *  非公平锁
      */
     static final class NonfairSync extends Sync {
         private static final long serialVersionUID = 7316153563782823691L;
@@ -202,12 +203,13 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         /**
          * Performs lock.  Try immediate barge, backing up to normal
          * acquire on failure.
+         * <br/>非公平锁加锁
          */
         final void lock() {
             if (compareAndSetState(0, 1))
-                setExclusiveOwnerThread(Thread.currentThread());
+                setExclusiveOwnerThread(Thread.currentThread());//抢锁成功，将获得锁的线程设置为该线程
             else
-                acquire(1);
+                acquire(1);//抢锁没有成功，将进入AQS获得锁的标准流程
         }
 
         protected final boolean tryAcquire(int acquires) {
@@ -232,18 +234,18 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         protected final boolean tryAcquire(int acquires) {
             final Thread current = Thread.currentThread();
             int c = getState();
-            if (c == 0) {
+            if (c == 0) {//锁状态值为0，说明没有线程用这把锁
                 if (!hasQueuedPredecessors() &&
                     compareAndSetState(0, acquires)) {
-                    setExclusiveOwnerThread(current);
+                    setExclusiveOwnerThread(current);//将获得锁的线程设置为该线程
                     return true;
                 }
             }
-            else if (current == getExclusiveOwnerThread()) {
+            else if (current == getExclusiveOwnerThread()) {//如果当前线程就是获得锁的线程
                 int nextc = c + acquires;
-                if (nextc < 0)
+                if (nextc < 0)//锁的值超过了整型的最大值  2^31-1,抛错
                     throw new Error("Maximum lock count exceeded");
-                setState(nextc);
+                setState(nextc);//如果没有超限，锁状态值设置为nextc
                 return true;
             }
             return false;
